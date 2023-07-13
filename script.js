@@ -3,34 +3,60 @@ let buttons = document.querySelectorAll("button");
 
 let string = "";
 let arr = Array.from(buttons);
-arr.forEach(button =>{
-    button.addEventListener('click', (e) =>{
-        if(e.target.innerHTML == '='){
-            string = eval(string);
-            input.value=string;
-        }
+arr.forEach(button => {
+    button.addEventListener('click', (e) => {
+        handleButtonClick(e.target.innerHTML);
+    });
+});
 
-        else if(e.target.innerHTML == 'AC'){
-            string = "";
-            input.value=string;
-        }
+document.addEventListener('keydown', (e) => {
+    const key = e.key;
+    if (isNumeric(key) || isOperator(key)) {
+        handleButtonClick(key);
+    } else if (key === '=' || key === 'Enter') {
+        calculateResult();
+    } else if (key === 'Backspace') {
+        deleteLastCharacter();
+    }
+});
 
-        else if(e.target.innerHTML == 'DEL'){
-            string = string.substring(0, string.length-1);
-            input.value=string;
-        }
-
-
-        // else if(e.target.innerHTML[0] == '%' ){
-        //     string = 'error';
-        //     input.value = string;
-        // }
-
-        else{
-        string += e.target.innerHTML;
+function handleButtonClick(value) {
+    if (isNumeric(value) || isOperator(value)) {
+        string += value;
         input.value = string;
-        }
+    } else if (value === '=') {
+        calculateResult();
+    } else if (value === 'AC') {
+        clearInput();
+    } else if (value === 'DEL') {
+        deleteLastCharacter();
+    }
+}
 
+function calculateResult() {
+    try {
+        string = eval(string);
+        input.value = string;
+    } catch (error) {
+        string = 'error';
+        input.value = string;
+    }
+}
 
-    })
-})
+function clearInput() {
+    string = "";
+    input.value = string;
+}
+
+function deleteLastCharacter() {
+    string = string.substring(0, string.length - 1);
+    input.value = string;
+}
+
+function isNumeric(value) {
+    return /^\d+$/.test(value);
+}
+
+function isOperator(value) {
+    return ['+', '-', '*', '/'].includes(value);
+}
